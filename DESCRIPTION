@@ -1,0 +1,18 @@
+Package: explan
+Title: Planning Psychology Experiments
+Version: 0.0.0.9000
+Authors@R: 
+    c(person("Dale", "Barr", , "dalejbarr@pm.me", role = c("aut", "cre"),
+             comment = c(ORCID = "0000-0002-1121-4608")),
+      person("Jinghui", "Liang", , "", role = c("aut"),
+             comment = c(ORCID = "0000-0000-0000-0000")))
+Description: Supplies functions to assist experimenters in planning their experiments.
+License: CC BY 4.0
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Depends: 
+    R (>= 2.10)
+LazyData: true
+Imports: 
+    numbers
