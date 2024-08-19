@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of `{explan}` is to help researchers design psychology experiments. Currently package provides an implementation of Permuted Subblock Randomization (PSR), a restricted randomization approach that improves power for within-participant study designs. See [Liang & Barr (2024)](https://osf.io/preprints/psyarxiv/4ums9) for details.
+The goal of `{explan}` is to help researchers design psychology experiments. Currently this package provides an implementation of Permuted Subblock Randomization (PSR), a restricted randomization approach that improves power for within-participant study designs. See [Liang & Barr (2024)](https://osf.io/preprints/psyarxiv/4ums9) for details.
 
 ```
 @article{liang_barr_2024,

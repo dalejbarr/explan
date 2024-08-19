@@ -8,10 +8,11 @@
 <!-- badges: end -->
 
 The goal of `{explan}` is to help researchers design psychology
-experiments. Currently package provides an implementation of Permuted
-Subblock Randomization (PSR), a restricted randomization approach that
-improves power for within-participant study designs. See [Liang & Barr
-(2024)](https://osf.io/preprints/psyarxiv/4ums9) for details.
+experiments. Currently this package provides an implementation of
+Permuted Subblock Randomization (PSR), a restricted randomization
+approach that improves power for within-participant study designs. See
+[Liang & Barr (2024)](https://osf.io/preprints/psyarxiv/4ums9) for
+details.
 
     @article{liang_barr_2024,
      title={Better power by design: Permuted-Subblock Randomization boosts power in repeated-measures experiments},
@@ -50,10 +51,10 @@ library(explan)
 
 psr(c("condition-A", "condition-B", "condition-C"),
     n_subblocks = 6, n_reps = 6)
-#>  [1] "condition-A" "condition-C" "condition-B" "condition-A" "condition-C"
-#>  [6] "condition-B" "condition-A" "condition-B" "condition-C" "condition-C"
-#> [11] "condition-A" "condition-B" "condition-C" "condition-A" "condition-B"
-#> [16] "condition-B" "condition-C" "condition-A"
+#>  [1] "condition-A" "condition-B" "condition-C" "condition-B" "condition-A"
+#>  [6] "condition-C" "condition-B" "condition-A" "condition-C" "condition-C"
+#> [11] "condition-B" "condition-A" "condition-C" "condition-A" "condition-B"
+#> [16] "condition-A" "condition-B" "condition-C"
 ```
 
 To find out the number of possible subblocks for a given number of
@@ -151,16 +152,16 @@ stroop_four |>
 #> # A tibble: 10 × 6
 #>      PID sb_no stimulus_id word   font_color congruency 
 #>    <int> <int> <fct>       <fct>  <fct>      <fct>      
-#>  1     1     1 8           yellow yellow     congruent  
-#>  2     1     1 23          red    red        congruent  
-#>  3     1     1 32          yellow green      incongruent
-#>  4     1     1 26          green  red        incongruent
-#>  5     1     2 39          red    yellow     incongruent
-#>  6     1     2 10          green  green      congruent  
-#>  7     1     2 34          green  blue       incongruent
-#>  8     1     2 3           red    red        congruent  
-#>  9     1     3 12          yellow yellow     congruent  
-#> 10     1     3 11          red    red        congruent
+#>  1     1     1 29          blue   red        incongruent
+#>  2     1     1 8           yellow yellow     congruent  
+#>  3     1     1 4           yellow yellow     congruent  
+#>  4     1     1 31          red    blue       incongruent
+#>  5     1     2 20          yellow yellow     congruent  
+#>  6     1     2 6           green  green      congruent  
+#>  7     1     2 32          yellow green      incongruent
+#>  8     1     2 26          green  red        incongruent
+#>  9     1     3 41          blue   red        incongruent
+#> 10     1     3 28          yellow blue       incongruent
 ```
 
 <!-- build the README.md with devtools::build_readme() -->
