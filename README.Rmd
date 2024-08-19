@@ -1,0 +1,93 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# explan
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of `{explan}` is to help researchers design psychology experiments. Currently package provides an implementation of Permuted Subblock Randomization (PSR), a restricted randomization approach that improves power for within-participant study designs. See [Liang & Barr (2024)](https://osf.io/preprints/psyarxiv/4ums9) for details.
+
+```
+@article{liang_barr_2024,
+ title={Better power by design: Permuted-Subblock Randomization boosts power in repeated-measures experiments},
+ url={osf.io/preprints/psyarxiv/4ums9},
+ DOI={10.31234/osf.io/4ums9},
+ publisher={PsyArXiv},
+ author={Liang, Jinghui and Barr, Dale J},
+ year={2024}
+}
+```
+
+The long-term goal is to provide a larger set of functions to help with counterbalancing, Latin Square designs, etc.
+
+## Installation
+
+You can install the development version of explan from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("dalejbarr/explan")
+```
+
+## Implementing Permuted Subblock Randomization
+
+The package includes two main functions for implementing PSR, a vector version (`psr()`) and a data frame version (`psr_stimuli()`).
+
+The vector version, `psr()` creates a vector of condition levels conforming to PSR given a set of levels corresponding to experimental conditions, desired number of subblocks, and number of repetitions per condition.
+
+```{r example}
+library(explan)
+
+psr(c("condition-A", "condition-B", "condition-C"),
+    n_subblocks = 6, n_reps = 6)
+```
+
+To find out the number of possible subblocks for a given number of repetition, use `possible_subblocks()`:
+
+```{r poss-subblocks}
+possible_subblocks(6)
+```
+
+The data frame version, `psr_stimuli()`, is a function that makes it possible to apply PSR to a table of stimuli. As an example, the built-in table `stroop_stimuli` contains example stimuli for a Stroop experiment, which has a two-level within participant factor of congruency.
+
+```{r stroop-stimuli}
+stroop_stimuli
+```
+
+You can determine the number of replications using `dplyr::count()`:
+
+```{r congruency-count}
+stroop_stimuli |>
+  dplyr::count(congruency)
+```
+
+```{r poss-subblocks-stroop}
+possible_subblocks(24)
+```
+
+To randomize this stimuli for a study with four participants, you would use the following code:
+
+```{r randomize-stroop}
+stroop_four <- psr_stimuli(stroop_stimuli, "congruency",
+                           n_subblocks = 12, n_part = 4)
+
+stroop_four |>
+  head(10)
+```
+
+<!-- build the README.md with devtools::build_readme() -->
+
+<!-- TODO: mention vignette -->
