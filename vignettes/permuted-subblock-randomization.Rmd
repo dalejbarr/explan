@@ -1,0 +1,130 @@
+---
+title: "randomization"
+output: rmarkdown::html_vignette
+bibliography: refs.bib
+vignette: >
+  %\VignetteIndexEntry{randomization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library("explan")
+```
+
+## Introduction
+
+The current version of **`{explan}`** focuses on randomization of within-participant independent variables where at each cell of the design there are repeated observations for each participant. The randomization scheme is *Permuted-Subblock Randomization* (PSR) [@Liang_Barr_2024], which divides a block of trials into balanced subblocks and permutes the conditions within each. This is performed independently for each participant in the study.
+
+The package provides two key functions to implement PSR. The first function, `psr()`, is the "vector" version of the function, in that it takes as input a vector of condition labels along with the target number of repetitions and the desired number of subblocks, and outputs a vector with a sequence of condition labels.
+
+The second function, `psr_stimuli()`, takes a data frame of stimuli as input along with the number of participants and returns a data frame with stimuli sequenced according to the PSR algorithm.
+
+## Vector version: randomizing conditions with `psr()`
+
+Using PSR with a single subblock is equivalent to the field-standard approach of simple restricted randomization. It produces a balanced sequence of condition labels.
+
+```{r psr-vector}
+conditions <- c("A", "B", "C", "D")
+
+psr(levels = conditions,
+    n_subblocks = 1,
+    n_reps = 6)    
+```
+
+However, using a single subblock may be suboptimal for power. To find out the number of subblocks that you could use with 6 repetitions per cell, use `possible_subblocks()`.
+
+```{r possible-subblocks}
+possible_subblocks(6)
+```
+
+Using the maximum number of subblocks is best for power, but might lead to an sequence that is too predictable, in that it simply permutes the sequence of all levels 6 times.
+
+```{r max-subblocks}
+psr(conditions, 6, 6)
+```
+
+So a better strategy might be to use the "submaximum" number of subblocks; i.e., the number just under the maximum in the set of possible subblocks, which is 3.
+
+```{r submax-subblocks}
+psr(conditions, 3, 6)
+```
+
+The `psr()` function is used to create a sequence for a single participant. If you need multiple participants, call it using `lapply()`
+
+```{r lapply-psr}
+n_participants <- 6L
+
+lapply(seq_len(n_participants),
+       \(.x) psr(conditions, 3, 6))
+```
+
+## Data frame version: Randomizing stimuli with `psr_stimuli()`
+
+Often the researcher needs to randomize a set of stimuli rather than a set of conditions, in which case `psr_stimuli()` is the function to use. As input, it takes a data frame of stimuli, the name of the independent variable, the desired number of subblocks, and the number of participants. Unlike with `psr()` there is no need to specify the levels of the independent variables nor the number of repetitions because this can be inferred from the data. As output, it returns a data frame with the stimuli sequenced according to PSR for the target number of participants.
+
+The **`{explan}`** package contains a data set of stimuli corresponding to a Stroop-style experiment [@Stroop_1935], where the participant sees a series of color words ('red', 'green', 'blue', 'yellow') each of which is printed in a font color that is either congruent with the meaning of the word (the word 'blue' printed in blue font) or incongruent with its meaning (the word 'blue' printed in red font). The participant's task is to respond to the font color. The standard finding is that people are slower and less accurate to respond to the incongruent words than the congruent words.
+
+```{r stroop-stim}
+## have a look at the built-in data frame with Stroop stimuli
+
+head(stroop_stimuli, 8)
+```
+
+We can implement the field-standard of simple restricted randomization by using a single subblock. We must tell the function the name of the variable encoding the levels of the independent variable (IV). 
+
+```{r stroop-stim-1}
+stroop_single <- psr_stimuli(stroop_stimuli, IVs = "congruency",
+                             n_subblocks = 1)
+
+head(stroop_single)
+```
+
+Note that the output contains two new variables, `sb_no`, the subblock number, which in this case is always `1` because there is a single subblock. 
+
+The output also contains the variable `PID`, which is an identifier for each participant in the table. By default the function randomizes for a single participant. We can create a table for multiple participants by setting the value of `n_part` to the number of participants we want (e.g., 4).
+
+```{r stroop-stim-4}
+stroop_rand <- psr_stimuli(stroop_stimuli, IVs = "congruency",
+                           n_subblocks = 1, n_part = 4)
+
+## this tells us how many total trials we have across 4 participants
+nrow(stroop_rand)
+
+head(stroop_rand, 8)
+
+table(stroop_rand$PID)
+```
+
+We would probably want more than a single subblock to improve power. We can figure out the number of subblocks but first we have to infer the number of repetitions from the data. We can do that most easily using `dplyr::count()`.
+
+```{r count-reps}
+stroop_stimuli |>
+  dplyr::count(congruency)
+```
+
+We have 24 repetitions. How many subblocks are possible?
+
+```{r poss-subblocks2}
+possible_subblocks(24)
+```
+
+OK, let's perform PSR with the "submaximum" number of subblocks (12).
+
+```{r psr-stimuli-submax}
+stroop_rand_submax <- psr_stimuli(stroop_stimuli,
+                                  IVs = "congruency",
+                                  n_subblocks = 12, n_part = 4)
+
+head(stroop_rand_submax, 8)
+```
+
+## References
+
