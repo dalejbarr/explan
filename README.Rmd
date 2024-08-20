@@ -38,8 +38,9 @@ The long-term goal is to provide a larger set of functions to help with counterb
 You can install the development version of explan from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("dalejbarr/explan")
+## install.packages("remotes")
+remotes::install_github("dalejbarr/explan", dependencies = TRUE,
+                        build_vignettes = TRUE)
 ```
 
 ## Implementing Permuted Subblock Randomization
@@ -90,4 +91,10 @@ stroop_four |>
 
 <!-- build the README.md with devtools::build_readme() -->
 
-<!-- TODO: mention vignette -->
+## Further information
+
+Please see the included vignette entitled "randomization". Make sure you have installed the package from github using `build_vignettes = TRUE` (see above) and then use the following command to see the vignette.
+
+``` r
+browseVignettes(package = "explan")
+```

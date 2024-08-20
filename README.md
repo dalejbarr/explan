@@ -32,8 +32,9 @@ You can install the development version of explan from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("dalejbarr/explan")
+## install.packages("remotes")
+remotes::install_github("dalejbarr/explan", dependencies = TRUE,
+                        build_vignettes = TRUE)
 ```
 
 ## Implementing Permuted Subblock Randomization
@@ -51,10 +52,10 @@ library(explan)
 
 psr(c("condition-A", "condition-B", "condition-C"),
     n_subblocks = 6, n_reps = 6)
-#>  [1] "condition-A" "condition-B" "condition-C" "condition-B" "condition-A"
+#>  [1] "condition-A" "condition-C" "condition-B" "condition-A" "condition-B"
 #>  [6] "condition-C" "condition-B" "condition-A" "condition-C" "condition-C"
-#> [11] "condition-B" "condition-A" "condition-C" "condition-A" "condition-B"
-#> [16] "condition-A" "condition-B" "condition-C"
+#> [11] "condition-B" "condition-A" "condition-B" "condition-A" "condition-C"
+#> [16] "condition-A" "condition-C" "condition-B"
 ```
 
 To find out the number of possible subblocks for a given number of
@@ -152,18 +153,26 @@ stroop_four |>
 #> # A tibble: 10 × 6
 #>      PID sb_no stimulus_id word   font_color congruency 
 #>    <int> <int> <fct>       <fct>  <fct>      <fct>      
-#>  1     1     1 29          blue   red        incongruent
-#>  2     1     1 8           yellow yellow     congruent  
-#>  3     1     1 4           yellow yellow     congruent  
-#>  4     1     1 31          red    blue       incongruent
-#>  5     1     2 20          yellow yellow     congruent  
-#>  6     1     2 6           green  green      congruent  
-#>  7     1     2 32          yellow green      incongruent
-#>  8     1     2 26          green  red        incongruent
-#>  9     1     3 41          blue   red        incongruent
-#> 10     1     3 28          yellow blue       incongruent
+#>  1     1     1 14          green  green      congruent  
+#>  2     1     1 10          green  green      congruent  
+#>  3     1     1 42          green  yellow     incongruent
+#>  4     1     1 44          yellow green      incongruent
+#>  5     1     2 26          green  red        incongruent
+#>  6     1     2 24          yellow yellow     congruent  
+#>  7     1     2 22          green  green      congruent  
+#>  8     1     2 29          blue   red        incongruent
+#>  9     1     3 47          red    green      incongruent
+#> 10     1     3 36          yellow red        incongruent
 ```
 
 <!-- build the README.md with devtools::build_readme() -->
 
-<!-- TODO: mention vignette -->
+## Further information
+
+Please see the included vignette entitled “randomization”. Make sure you
+have installed the package from github using `build_vignettes = TRUE`
+(see above) and then use the following command to see the vignette.
+
+``` r
+browseVignettes(package = "explan")
+```
