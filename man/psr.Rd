@@ -2,7 +2,7 @@
 % Please edit documentation in R/randomization.R
 \name{psr}
 \alias{psr}
-\title{Permuted-subblock randomization (PSR)}
+\title{Permuted-subblock randomization (PSR) for one-factor designs}
 \usage{
 psr(levels, n_subblocks, n_reps)
 }

@@ -14,6 +14,39 @@ possible_subblocks <- function(n_reps) {
   numbers::divisors(n_reps)
 }
 
+#' Construct a 2x2 table for conditions.
+#' Calculates the set of possible sub-blocks for given values of
+#' `n_reps` (number of repetitions of each factor level).
+#'
+#' @param facR A vector containing two labels of the first (row) factor.
+#' @param facC A vector containing two labels of the second (column) factor.
+#'
+#' @returns A matrix with each entry being one of the conditions, followed by
+#' corresponding numbers to identify relitive positions in PSR-C and PSR-E.
+#'
+#' @seealso
+#' [walk_2x2()] to order stimuli based on relitive positions.
+#' [psr_2x2_stimuli()] to randomize 2x2 factorial design stimuli with PSR.
+#' 
+#' @examples
+#' con_2x2(facR = c("A", "a"),
+#'         facC = c("B", "b")
+#' @export
+
+con_2x2 <- function(facR = c("A", "a"),
+                    facC = c("B", "b")){
+    cons <- sapply(facR, \(.x) paste(.x, facC, sep = "/"),
+                      simplify = TRUE, USE.NAMES = FALSE)
+    nums <- paste0("(", as.character(1:length(c(facR, facC))), ")")
+    final_tbl <- matrix(paste(cons, nums),
+                        nrow = length(facR), ncol = length(facC),
+                        byrow = TRUE)    
+    rownames(final_tbl) <- facR
+    colnames(final_tbl) <- facC  
+
+    final_tbl
+}
+
 #' Tabulate streaks in a vector
 #'
 #' Given a vector `x`, produce a frequency table of the number of
