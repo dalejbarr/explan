@@ -47,10 +47,11 @@ this is not a fully counterbalanced design.
 \examples{
 
 psr_stimuli(stim_table = stroop_stimuli_factorial,
-            IVs = c("font_color", "congruency"),
+            IVs = c("congruency", "positions"),
             algorithm = "circular",
             n_part = 4L,
             sb_varname = "sb_no",
             part_varname = "PID")
+
 
 }
