@@ -30,7 +30,7 @@ possible_subblocks <- function(n_reps) {
 #' 
 #' @examples
 #' con_2x2(facR = c("A", "a"),
-#'         facC = c("B", "b")
+#'         facC = c("B", "b"))
 #' @export
 
 con_2x2 <- function(facR = c("A", "a"),

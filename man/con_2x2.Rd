@@ -24,7 +24,7 @@ Calculates the set of possible sub-blocks for given values of
 }
 \examples{
 con_2x2(facR = c("A", "a"),
-        facC = c("B", "b")
+        facC = c("B", "b"))
 }
 \seealso{
 \code{\link[=walk_2x2]{walk_2x2()}} to order stimuli based on relitive positions.

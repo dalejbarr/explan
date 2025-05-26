@@ -12,7 +12,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
-)
+  )
 ```
 
 ```{r setup}
@@ -21,13 +21,15 @@ library("explan")
 
 ## Introduction
 
-The current version of **`{explan}`** focuses on randomization of within-participant independent variables where at each cell of the design there are repeated observations for each participant. The randomization scheme is *Permuted-Subblock Randomization* (PSR) [@Liang_Barr_2024], which divides a block of trials into balanced subblocks and permutes the conditions within each. This is performed independently for each participant in the study.
+The current version of **`{explan}`** focuses on randomization of within-participant independent variables where at each cell of the design there are repeated observations for each participant. The randomization scheme is *Permuted-Subblock Randomization* (PSR) [@liangBetterPowerDesign2024], which divides a block of trials into balanced subblocks and permutes the conditions within each. For [one-factor design]{#one-factor-design}, this is performed independently for each participant in the study, while in [2x2 factorial design]{#fac-design}, two adjusted PSR algorithms with counterbalance are considered.
 
-The package provides two key functions to implement PSR. The first function, `psr()`, is the "vector" version of the function, in that it takes as input a vector of condition labels along with the target number of repetitions and the desired number of subblocks, and outputs a vector with a sequence of condition labels.
+## One-factor design {#one-factor-design}
+
+### Vector version: randomizing conditions with `psr()`
+
+The package provides two key functions to implement PSR in one-factor design. The first function, `psr()`, is the "vector" version of the function, in that it takes as input a vector of condition labels along with the target number of repetitions and the desired number of subblocks, and outputs a vector with a sequence of condition labels.
 
 The second function, `psr_stimuli()`, takes a data frame of stimuli as input along with the number of participants and returns a data frame with stimuli sequenced according to the PSR algorithm.
-
-## Vector version: randomizing conditions with `psr()`
 
 Using PSR with a single subblock is equivalent to the field-standard approach of simple restricted randomization. It produces a balanced sequence of condition labels.
 
@@ -36,7 +38,7 @@ conditions <- c("A", "B", "C", "D")
 
 psr(levels = conditions,
     n_subblocks = 1,
-    n_reps = 6)    
+    n_reps = 6)
 ```
 
 However, using a single subblock may be suboptimal for power. To find out the number of subblocks that you could use with 6 repetitions per cell, use `possible_subblocks()`.
@@ -66,7 +68,7 @@ lapply(seq_len(n_participants),
        \(.x) psr(conditions, 3, 6))
 ```
 
-## Data frame version: Randomizing stimuli with `psr_stimuli()`
+### Data frame version: Randomizing stimuli with `psr_stimuli()`
 
 Often the researcher needs to randomize a set of stimuli rather than a set of conditions, in which case `psr_stimuli()` is the function to use. As input, it takes a data frame of stimuli, the name of the independent variable, the desired number of subblocks, and the number of participants. Unlike with `psr()` there is no need to specify the levels of the independent variables nor the number of repetitions because this can be inferred from the data. As output, it returns a data frame with the stimuli sequenced according to PSR for the target number of participants.
 
@@ -125,6 +127,103 @@ stroop_rand_submax <- psr_stimuli(stroop_stimuli,
 
 head(stroop_rand_submax, 8)
 ```
+
+## Two-by-two (2x2) factorial design {#fac-design}
+
+The package **`{explan}`** also provides vector and data frame versions of 2x2 factorial conditions. But before implementing algorithms, it would be useful to inspect how factor levels are combined to form experiment conditions. To do so, use `con_2x2()`.
+
+```{r con-tbale}
+con_2x2(facR = c("A", "a"), 
+        facC = c("B", "b"))
+```
+
+The resulting condition table contains conditions within every entries. The numbers following tell us the relative positions of conditions in a vector. This is important for implementing PSR in factorial designs.
+
+### Vector version: randomizing conditions with `walk_2x2()`
+
+In 2x2 factorial design, PSR-max (PSR-4) is one of available algorithms we can use.
+
+```{r fac-pmax-example}
+fac_conditions <- c("A/B", "A/b", "b/B", "a/b")
+
+psr(levels = conditions,
+    n_subblocks = length(fac_conditions),
+    n_reps = 2)
+```
+
+But specifically, we can also use PSR-C and PSR-E to randomize conditions.
+
+```{r fac-walk-c}
+walk_2x2(
+    np = 4, nr = 2,
+    facR = c("A", "a"), 
+    facC = c("B", "b"),
+    method = "c"
+)
+```
+
+This function provides a list containing balanced sequences for 4 participants. Here, `method = "c"` tells `walk_2x2()` to use PSR-C to arrange stimuli by clockwise "walking" through the 2x2 condition table, as generated by `con_2x2()`. Looking at stimuli numbers in the condition table, the stimuli order would be "1 - 2 - 4 - 3 - 1 - ...". Starting conditions are counterbalanced across participants.
+
+We can also change the algorithm by setting `method = "e"`. This leads to a stimuli order like "1 - 2 - 3 - 4 - 1 - ...", similar to drawing the number "8" on the condition table.
+
+```{r fac-walk-e}
+walk_2x2(
+    np = 4, nr = 2,
+    facR = c("A", "a"), 
+    facC = c("B", "b"),
+    method = "e"
+)
+```
+
+When `np` is not a multiple of 4, `walk_2x2()` can still randomize sequence for participant, but you would receive a warning message suggesting this is not a fully balanced design, because some possible starting conditions are not fully assigned and there might be risks for position effects.
+
+```{r r-fac-walk-unbalance}
+walk_2x2(
+    np = 1, nr = 2,
+    facR = c("A", "a"), 
+    facC = c("B", "b"),
+    method = "e"
+)
+```
+
+### Data frame version: randomizing stimuli in factorial design with `psr_2x2_stimuli()`
+
+As well as in one-factor design, the **`{explan}`** package allows users to randomize stimuli in 2x2 factorial design with the function `psr_2x2_stimuli()`. Similar to the `psr_stimuli()` function, `psr_2x2_stimuli()` takes a stimuli data frame of stimuli, independent variable names, and the desired number of participants as arguments. But instead of the desired number of subblocks, `psr_2x2_stimuli()` takes the desired PSR algorithms as its last mandatory argument, because both PSR-C and PSR-E are developed based on the largest possible number of subblocks. This number is equal to the number of repetitions per condition, and can be inferred directly from the data frame.
+
+As a demonstration, the **`{explan}`** package contains a dataset of a factorial Stroop-style experiment [@rosenbaumStandYourStroop2017]. In this dataset, a participant sees a series of color words (‘red’, ‘green’, ‘blue’, ‘brown’), each of which is printed in a font color that is either congruent with the meaning of the word (the word ‘blue’ printed in blue font) or incongruent with its meaning (the word ‘blue’ printed in red font). Additionally, participants would be required to to respond to the font color with two different physical positions, sitting and standing. The standard finding is that people are slower and less accurate to respond to the incongruent words than the congruent words; but the differences respond speed are smaller when people are standing.
+
+```{r fac-inspect-data}
+head(stroop_stimuli_factorial, 8)
+```
+
+Compare to our one-factor design example dataset, `stroop_stimuli`, `stroop_stimuli_factorial` has one more column `positions` to record the requiring physical position when a participant responds to given stimuli.
+
+To randomize stimuli to a number of desired participants (4 in our example) and with PSR-C, use the following code.
+
+```{r fac-rand-stimuli}
+stroop_fac_rand <- psr_2x2_stimuli(
+    stim_table = stroop_stimuli_factorial,
+    IVs = c("congruency", "positions"),
+    n_part = 4,
+    algorithm = "circular"
+)
+
+## this tells us how many total trials we have across 4 participants
+nrow(stroop_fac_rand)
+
+head(stroop_fac_rand, 8)
+
+table(stroop_fac_rand$PID)
+```
+
+If we look at `congruency` and `positions`, we can see they have been combined and arranged in a clockwise order.
+
+```{r stimuli-2x2-tbl}
+con_2x2(facR = c("congruent", "incongruent"),
+        facC = c("sitting", "standing"))
+```
+
+Except PSR-C, PSR-E and PSR-max (standard PSR with the largest number of possible subblocks) are also available. To use them, simply use arguments `algorithm = "eight"` or `algorithm = "max"`.
 
 ## References
 
